@@ -18,6 +18,11 @@ public class TradeProcessor {
     private static String MSG_SUCCESS = "Trade saved successfully";
     private static String MSG_FAILURE = "Trade not saved successfully";
 
+    /***
+     * Handle a Trade in JSON format and return a TradeToken
+     * @param trade
+     * @return
+     */
     @POST
     @Path("trade")
     @Consumes(MediaType.APPLICATION_JSON)

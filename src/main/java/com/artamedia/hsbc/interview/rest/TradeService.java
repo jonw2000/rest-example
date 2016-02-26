@@ -23,8 +23,21 @@ public class TradeService {
     private static final Logger logger = LoggerFactory.getLogger(TradeProcessor.class);
     private static final ResponseCache respCache = new GuavaResponseCache(72);
     private static final TradeCache tradeCache = new GuavaTradeCache(72);
+    private final Client client;
 
+    public TradeService() {
+        client = ClientBuilder.newClient();
+    }
 
+    public TradeService(Client client) {
+        this.client = client;
+    }
+
+    /***
+     * Handle a trade in XML format and return a TradeToken
+     * @param trade
+     * @return
+     */
     @POST
     @Path("save")
     @Consumes(MediaType.APPLICATION_XML)
@@ -46,7 +59,6 @@ public class TradeService {
     }
 
     private Response postToTradeProcessor(Trade trade) {
-        Client client = ClientBuilder.newClient();
         WebTarget target = client.target("http://localhost:8081/v1/").path("process/trade");
         return target.request(MediaType.APPLICATION_JSON).post(Entity.json(trade), Response.class);
     }
@@ -58,10 +70,8 @@ public class TradeService {
         logger.info("Received {}", id);
         Long longId = Long.parseLong(id);
 
-        Response res = Optional.ofNullable(tradeCache.get(longId))
+        return Optional.ofNullable(tradeCache.get(longId))
                 .map(t -> Response.ok(t.toJson()).build())
                 .orElse(Response.status(404).build());
-
-        return res;
     }
 }

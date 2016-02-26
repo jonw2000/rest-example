@@ -23,5 +23,7 @@ public class TradeProcessorTest {
         TradeToken res = proc.save(t);
 
         assertThat(res.getToken(), is(notNullValue()));
+        assertThat(res.getTime(), is(notNullValue()));
+        assertThat(res.getResponse(), is("Trade saved successfully"));
     }
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 
 public class AppServer extends AbstractHandler {
 
+    // Basic response when accessing root
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -26,17 +27,18 @@ public class AppServer extends AbstractHandler {
 
     public static void main(String[] args) throws Exception {
 
-        Server server1 = createServer(8080, "1", TradeService.class);
-        Server server2 = createServer(8081, "2", TradeProcessor.class);
+        // Create two servers, one for posting XML and one as a REST json service
+        Server tradeServer = createServer(8080, "1", TradeService.class);
+        Server tradeProcessor = createServer(8081, "2", TradeProcessor.class);
 
         try {
-            server1.start();
-            server2.start();
-            server1.join();
-            server2.join();
+            tradeServer.start();
+            tradeProcessor.start();
+            tradeServer.join();
+            tradeProcessor.join();
         } finally {
-            server1.destroy();
-            server2.destroy();
+            tradeServer.destroy();
+            tradeProcessor.destroy();
         }
     }
 
