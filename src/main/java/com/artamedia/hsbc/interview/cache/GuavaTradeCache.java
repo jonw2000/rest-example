@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -24,11 +25,11 @@ public class GuavaTradeCache implements TradeCache {
         return id;
     }
 
-    public Trade get(Long id) throws ExecutionException {
-        return trades.get(id, null);
+    public Trade get(Long id) {
+        return trades.getIfPresent(id);
     }
 
     public boolean contains(Long id) throws ExecutionException {
-        return trades.get(id, null) != null;
+        return trades.asMap().containsKey(id);
     }
 }

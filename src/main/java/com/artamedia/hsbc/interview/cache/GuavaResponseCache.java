@@ -33,6 +33,6 @@ public class GuavaResponseCache implements ResponseCache {
     }
 
     public boolean contains(Trade t) throws ExecutionException {
-        return trades.get(t) != null;
+        return trades.asMap().containsKey(t);
     }
 }

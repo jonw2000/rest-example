@@ -3,6 +3,7 @@ package com.artamedia.hsbc.interview.model;
 import com.artamedia.hsbc.interview.model.json.TradeSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
@@ -63,10 +64,12 @@ public class Trade {
     }
 
     @XmlElement( name = "TradeId")
+    @JsonProperty("id")
     public long getTradeId() {
         return tradeId;
     }
 
+    @JsonProperty("id")
     public void setTradeId(long tradeId) {
         this.tradeId = tradeId;
     }

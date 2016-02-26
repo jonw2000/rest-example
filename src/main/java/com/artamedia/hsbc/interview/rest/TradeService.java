@@ -15,7 +15,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 
 @Path("/trade/service")
 public class TradeService {
@@ -37,9 +37,7 @@ public class TradeService {
         logger.debug("Converted to {}", json);
 
         logger.info("Posting to REST service");
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target("http://localhost:8081/v1/").path("process/trade");
-        Response resp = target.request(MediaType.APPLICATION_JSON).post(Entity.json(trade), Response.class);
+        Response resp = postToTradeProcessor(trade);
 
         String tokenJson = resp.readEntity(String.class);
         respCache.put(trade, tokenJson);
@@ -47,28 +45,23 @@ public class TradeService {
         return tokenJson;
     }
 
+    private Response postToTradeProcessor(Trade trade) {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://localhost:8081/v1/").path("process/trade");
+        return target.request(MediaType.APPLICATION_JSON).post(Entity.json(trade), Response.class);
+    }
+
     @GET
-    @Path("get")
+    @Path("get/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@QueryParam("id") String id) {
+    public Response get(@PathParam("id") String id) {
         logger.info("Received {}", id);
-        String resp;
-        try {
-            Long longId = Long.getLong(id);
-            if (tradeCache.contains(longId)) {
-                resp = tradeCache.get(longId).toJson();
-            } else {
-                resp = Response.status(404)
-                        .entity("Trade not found")
-                        .type(MediaType.APPLICATION_JSON)
-                        .build().toString();
-            }
-        } catch (ExecutionException e) {
-            resp = Response.status(404)
-                    .entity("Trade not found")
-                    .type(MediaType.APPLICATION_JSON)
-                    .build().toString();
-        }
-        return resp;
+        Long longId = Long.parseLong(id);
+
+        Response res = Optional.ofNullable(tradeCache.get(longId))
+                .map(t -> Response.ok(t.toJson()).build())
+                .orElse(Response.status(404).build());
+
+        return res;
     }
 }
